@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoviesWatchedDomain", "MoviesWatchedDomain\MoviesWatchedDomain.csproj", "{1A95F5BD-C371-4DB5-9253-2566784BEBB2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoviesWatchedInfrastructure", "MoviesWatchedInfrastructure\MoviesWatchedInfrastructure.csproj", "{B8DA84D0-C401-4630-9A2D-44E50C6D445B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1A95F5BD-C371-4DB5-9253-2566784BEBB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A95F5BD-C371-4DB5-9253-2566784BEBB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A95F5BD-C371-4DB5-9253-2566784BEBB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A95F5BD-C371-4DB5-9253-2566784BEBB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8DA84D0-C401-4630-9A2D-44E50C6D445B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8DA84D0-C401-4630-9A2D-44E50C6D445B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8DA84D0-C401-4630-9A2D-44E50C6D445B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8DA84D0-C401-4630-9A2D-44E50C6D445B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B3B5DF25-8C9D-45DD-8DAE-2076062038A2}
+	EndGlobalSection
+EndGlobal
