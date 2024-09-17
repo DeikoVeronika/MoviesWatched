@@ -12,7 +12,7 @@ public partial class MoviesGenre
     [Required(ErrorMessage = "Оберіть жанр")]
     public int GenreId { get; set; }
 
-    public virtual Genre Genre { get; set; } = null!;
+    public virtual Genre? Genre { get; set; } = null!;
 
-    public virtual Movie Movie { get; set; } = null!;
+    public virtual Movie? Movie { get; set; } = null!;
 }

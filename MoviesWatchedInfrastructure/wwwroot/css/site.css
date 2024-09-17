@@ -18,5 +18,36 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+    font-family: "Montserrat", system-ui;
+    margin-bottom: 60px;
 }
+
+:root {
+    --color_white: #FFF;
+    --color-white: #000;
+    --color_gray_400: #9CA3AF;
+    --color_gray_900: #111827;
+}
+
+/* start movies block */
+.movie_realise-date, .movie_genres {
+    font-weight: 700;
+    font-size: 12px;
+}
+.movie_realise-date {
+    color: var(--color_gray_400);
+}
+.movie_genres {
+    color: var(--color_gray_900);
+}
+.movie_review {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--color_gray_900);
+}
+.movie_title {
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--color_gray_900);
+}
+/* end movies block */

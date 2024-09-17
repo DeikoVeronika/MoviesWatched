@@ -25,7 +25,7 @@ public partial class Movie
     [Display(Name = "Дата перегляду, оцінка, коментар")]
     public string? ReviewDate { get; set; }
 
-    public virtual Language Language { get; set; } = null!;
+    public virtual Language? Language { get; set; } = null!;
 
     public virtual ICollection<MoviesActor> MoviesActors { get; set; } = new List<MoviesActor>();
 

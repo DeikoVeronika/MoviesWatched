@@ -146,6 +146,7 @@ namespace MoviesWatchedInfrastructure.Controllers
             return View(moviesGenre);
         }
 
+
         // POST: MoviesGenres/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]

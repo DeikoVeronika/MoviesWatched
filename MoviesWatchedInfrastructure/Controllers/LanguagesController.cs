@@ -33,14 +33,22 @@ namespace MoviesWatchedInfrastructure.Controllers
             }
 
             var language = await _context.Languages
+                .Include(l => l.Movies) 
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (language == null)
             {
                 return NotFound();
             }
 
+            var movies = language.Movies.ToList();
+
+            ViewBag.Language = language;
+            ViewBag.Movies = movies;
+
             return View(language);
         }
+
 
         // GET: Languages/Create
         public IActionResult Create()

@@ -33,14 +33,23 @@ namespace MoviesWatchedInfrastructure.Controllers
             }
 
             var genre = await _context.Genres
+                .Include(g => g.MoviesGenres)
+                    .ThenInclude(mg => mg.Movie)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (genre == null)
             {
                 return NotFound();
             }
 
-            return View(genre);
+            var movies = genre.MoviesGenres.Select(mg => mg.Movie).ToList();
+
+            ViewBag.Genre = genre;
+            ViewBag.Movies = movies;
+
+            return View();
         }
+
 
         // GET: Genres/Create
         public IActionResult Create()

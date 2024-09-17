@@ -33,14 +33,23 @@ namespace MoviesWatchedInfrastructure.Controllers
             }
 
             var actor = await _context.Actors
+                .Include(a => a.MoviesActors) 
+                    .ThenInclude(ma => ma.Movie) 
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (actor == null)
             {
                 return NotFound();
             }
 
+            var movies = actor.MoviesActors.Select(ma => ma.Movie).ToList();
+
+            ViewBag.Actor = actor;
+            ViewBag.Movies = movies;
+
             return View(actor);
         }
+
 
         // GET: Actors/Create
         public IActionResult Create()

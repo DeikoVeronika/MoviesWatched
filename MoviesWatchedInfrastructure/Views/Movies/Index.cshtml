@@ -63,3 +63,18 @@
 }
     </tbody>
 </table>
+
+<div class="movies_wrap">
+    @foreach (var item in Model)
+    {
+            <div class="movie_card">
+                <div class="movie_poster">
+                    @Html.DisplayFor(modelItem => item.MovieImage)
+                </div>
+                <div class="movie_realise-date">@Html.DisplayFor(modelItem => item.ReleaseDate)</div>
+            <div class="movie_title">@Html.DisplayFor(modelItem => item.Title)</div>
+                <div class="movie_review">@Html.DisplayFor(modelItem => item.ReviewDate)</div>
+                <div class="movie_genres"></div>
+            </div>
+    }
+</div>
