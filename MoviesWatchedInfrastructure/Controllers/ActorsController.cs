@@ -66,9 +66,14 @@ namespace MoviesWatchedInfrastructure.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(actor);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (!await IsActorExists(actor.Name, actor.Id))
+                {
+                    _context.Add(actor);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                    ModelState.AddModelError("Name", "Актор з таким іменем вже створений.");
             }
             return View(actor);
         }
@@ -103,24 +108,31 @@ namespace MoviesWatchedInfrastructure.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                if (!await IsActorExists(actor.Name, actor.Id))
                 {
-                    _context.Update(actor);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ActorExists(actor.Id))
+                    try
                     {
-                        return NotFound();
+                        _context.Update(actor);
+                        await _context.SaveChangesAsync();
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!ActorExists(actor.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
+                    return RedirectToAction(nameof(Index));
                 }
-                return RedirectToAction(nameof(Index));
+                else
+                    ModelState.AddModelError("Name", "Актор з таким іменем вже створений.");
             }
+
+
             return View(actor);
         }
 
@@ -161,5 +173,15 @@ namespace MoviesWatchedInfrastructure.Controllers
         {
             return _context.Actors.Any(e => e.Id == id);
         }
+
+        private async Task<bool> IsActorExists(string name, int id)
+        {
+            var actor = await _context.Actors
+                .FirstOrDefaultAsync(m => m.Name == name 
+                                       && m.Id != id);
+
+            return actor != null;
+        }
+
     }
 }

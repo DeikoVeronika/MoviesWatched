@@ -31,37 +31,32 @@
                 <span asp-validation-for="LanguageId" class="text-danger"></span>
             </div>
 
-            <!-- Поле для вибору акторів через чекбокси -->
             <div class="form-group">
                 <label class="control-label">Actors</label>
                 <div>
                     @foreach (var actor in ViewBag.Actors)
                     {
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="selectedActors" value="@actor.Value" id="actor_@actor.Value">
-                            <label class="form-check-label" for="actor_@actor.Value">
-                                @actor.Text
-                            </label>
+                            <input class="form-check-input" type="checkbox" name="selectedActors" value="@actor.Value" id="actor_@actor.Value" @(actor.Selected ? "checked" : "")>
+                            <label class="form-check-label" for="actor_@actor.Value">@actor.Text</label>
                         </div>
                     }
                 </div>
             </div>
 
-            <!-- Поле для вибору жанрів через чекбокси -->
             <div class="form-group">
                 <label class="control-label">Genres</label>
                 <div>
                     @foreach (var genre in ViewBag.Genres)
                     {
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="selectedGenres" value="@genre.Value" id="genre_@genre.Value">
-                            <label class="form-check-label" for="genre_@genre.Value">
-                                @genre.Text
-                            </label>
+                            <input class="form-check-input" type="checkbox" name="selectedGenres" value="@genre.Value" id="genre_@genre.Value" @(genre.Selected ? "checked" : "")>
+                            <label class="form-check-label" for="genre_@genre.Value">@genre.Text</label>
                         </div>
                     }
                 </div>
             </div>
+
 
             <div class="form-group">
                 <label asp-for="Duration" class="control-label"></label>

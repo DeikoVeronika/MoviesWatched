@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -66,9 +67,15 @@ namespace MoviesWatchedInfrastructure.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(genre);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (!await IsGenreExists(genre.Name, genre.Id))
+                {
+                    _context.Add(genre);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                    ModelState.AddModelError("Name", "Жанр з такою назвою вже існує.");
+
             }
             return View(genre);
         }
@@ -103,23 +110,29 @@ namespace MoviesWatchedInfrastructure.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                if (!await IsGenreExists(genre.Name, genre.Id))
                 {
-                    _context.Update(genre);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!GenreExists(genre.Id))
+                    try
                     {
-                        return NotFound();
+                        _context.Update(genre);
+                        await _context.SaveChangesAsync();
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!GenreExists(genre.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
+                    return RedirectToAction(nameof(Index));
                 }
-                return RedirectToAction(nameof(Index));
+                else
+                    ModelState.AddModelError("Name", "Жанр з такою назвою вже існує.");
+
             }
             return View(genre);
         }
@@ -160,6 +173,14 @@ namespace MoviesWatchedInfrastructure.Controllers
         private bool GenreExists(int id)
         {
             return _context.Genres.Any(e => e.Id == id);
+        }
+        private async Task<bool> IsGenreExists(string name, int id)
+        {
+            var genre = await _context.Genres
+                .FirstOrDefaultAsync(m => m.Name == name 
+                                       && m.Id != id);
+
+            return genre != null;
         }
     }
 }

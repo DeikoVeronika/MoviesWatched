@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Humanizer.Localisation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -65,9 +66,14 @@ namespace MoviesWatchedInfrastructure.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(language);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (!await IsLanguageExists(language.Name, language.Id))
+                {
+                    _context.Add(language);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                    ModelState.AddModelError("Name", "Мова з такою назвою вже існує.");
             }
             return View(language);
         }
@@ -102,23 +108,29 @@ namespace MoviesWatchedInfrastructure.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                if (!await IsLanguageExists(language.Name, language.Id))
                 {
-                    _context.Update(language);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!LanguageExists(language.Id))
+                    try
                     {
-                        return NotFound();
+                        _context.Update(language);
+                        await _context.SaveChangesAsync();
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!LanguageExists(language.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
+                    return RedirectToAction(nameof(Index));
                 }
-                return RedirectToAction(nameof(Index));
+                else
+                    ModelState.AddModelError("Name", "Мова з такою назвою вже існує.");
+
             }
             return View(language);
         }
@@ -159,6 +171,14 @@ namespace MoviesWatchedInfrastructure.Controllers
         private bool LanguageExists(int id)
         {
             return _context.Languages.Any(e => e.Id == id);
+        }
+        private async Task<bool> IsLanguageExists(string name, int id)
+        {
+            var language = await _context.Languages
+                .FirstOrDefaultAsync(m => m.Name == name 
+                                       && m.Id != id);
+
+            return language != null;
         }
     }
 }

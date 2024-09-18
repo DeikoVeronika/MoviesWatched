@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -46,31 +47,32 @@ namespace MoviesWatchedInfrastructure.Controllers
         }
 
         //для заповнення випадаючих списків мов, акторів та жанрів як при створенні/редагуванні
-        private void PopulateDropDowns(Movie movie = null)
+        private void PopulateDropDowns(Movie movie = null, List<int> selectedActors = null, List<int> selectedGenres = null)
         {
             // Мови
             ViewData["LanguageId"] = new SelectList(_context.Languages, "Id", "Name", movie?.LanguageId);
 
             // Актори
             var allActors = _context.Actors.ToList();
-            var selectedActors = movie?.MoviesActors.Select(ma => ma.ActorId).ToList() ?? new List<int>();
+            var selectedActorsIds = selectedActors ?? movie?.MoviesActors.Select(ma => ma.ActorId).ToList() ?? new List<int>();
             ViewBag.Actors = allActors.Select(a => new SelectListItem
             {
                 Value = a.Id.ToString(),
                 Text = a.Name,
-                Selected = selectedActors.Contains(a.Id)
-            });
+                Selected = selectedActorsIds.Contains(a.Id)
+            }).ToList();
 
             // Жанри
             var allGenres = _context.Genres.ToList();
-            var selectedGenres = movie?.MoviesGenres.Select(mg => mg.GenreId).ToList() ?? new List<int>();
+            var selectedGenresIds = selectedGenres ?? movie?.MoviesGenres.Select(mg => mg.GenreId).ToList() ?? new List<int>();
             ViewBag.Genres = allGenres.Select(g => new SelectListItem
             {
                 Value = g.Id.ToString(),
                 Text = g.Name,
-                Selected = selectedGenres.Contains(g.Id)
-            });
+                Selected = selectedGenresIds.Contains(g.Id)
+            }).ToList();
         }
+
 
         public IActionResult Create()
         {
@@ -84,17 +86,25 @@ namespace MoviesWatchedInfrastructure.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Додаємо вибраних акторів і жанри до фільму
-                AddMovieActorsAndGenres(movie, selectedActors, selectedGenres);
+                if (!await IsMovieExists(movie.Title, movie.ReleaseDate, movie.LanguageId, movie.Id))
+                {
+                    // Додаємо вибраних акторів і жанри до фільму
+                    AddMovieActorsAndGenres(movie, selectedActors, selectedGenres);
 
-                _context.Add(movie);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                    _context.Add(movie);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    ModelState.AddModelError("LanguageId", "Фільм такого року та мовою перегляду вже створений.");
+                }
             }
 
-            PopulateDropDowns(movie);
+            PopulateDropDowns(movie, selectedActors.ToList(), selectedGenres.ToList());
             return View(movie);
         }
+
 
         public async Task<IActionResult> Edit(int? id)
         {
@@ -128,29 +138,34 @@ namespace MoviesWatchedInfrastructure.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                if (!await IsMovieExists(movie.Title, movie.ReleaseDate, movie.LanguageId, movie.Id))
                 {
-                    _context.Update(movie);
-                    await _context.SaveChangesAsync();
+                    try
+                    {
+                        _context.Update(movie);
+                        await _context.SaveChangesAsync();
 
-                    // Оновлюємо акторів і жанри
-                    await UpdateMovieActorsAndGenres(movie, selectedActors, selectedGenres);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!MovieExists(movie.Id))
-                    {
-                        return NotFound();
+                        await UpdateMovieActorsAndGenres(movie, selectedActors, selectedGenres);
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!MovieExists(movie.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
+                    return RedirectToAction(nameof(Index));
                 }
-                return RedirectToAction(nameof(Index));
+                else
+                    ModelState.AddModelError("LanguageId", "Фільм такого року та мовою перегляду вже створений.");
+
             }
 
-            PopulateDropDowns(movie);
+            PopulateDropDowns(movie, selectedActors.ToList(), selectedGenres.ToList());
             return View(movie);
         }
 
@@ -242,5 +257,16 @@ namespace MoviesWatchedInfrastructure.Controllers
         {
             return _context.Movies.Any(e => e.Id == id);
         }
+        private async Task<bool> IsMovieExists(string title, short releaseDate, int languageId, int id)
+        {
+            var movie = await _context.Movies
+                .FirstOrDefaultAsync(m => m.Title == title
+                                       && m.ReleaseDate == releaseDate
+                                       && m.LanguageId == languageId
+                                       && m.Id != id);
+
+            return movie != null;
+        }
+
     }
 }
