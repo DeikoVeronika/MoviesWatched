@@ -25,9 +25,13 @@
         </dd>
     </dl>
     
-    <form asp-action="Delete">
+    <form id="deleteForm" asp-action="Delete" method="post" data-return-url="@Url.Action("Index")">
         <input type="hidden" asp-for="Id" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-action="Index">Back to List</a>
     </form>
 </div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/deletion.js"></script>
+}

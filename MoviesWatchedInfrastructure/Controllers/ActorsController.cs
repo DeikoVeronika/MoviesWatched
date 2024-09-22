@@ -28,9 +28,8 @@ namespace MoviesWatchedInfrastructure.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
+
 
             var actor = await _context.Actors
                 .Include(a => a.MoviesActors) 
@@ -38,9 +37,8 @@ namespace MoviesWatchedInfrastructure.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (actor == null)
-            {
                 return NotFound();
-            }
+
 
             var movies = actor.MoviesActors.Select(ma => ma.Movie).ToList();
 
@@ -82,15 +80,13 @@ namespace MoviesWatchedInfrastructure.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
+
 
             var actor = await _context.Actors.FindAsync(id);
             if (actor == null)
-            {
                 return NotFound();
-            }
+
             return View(actor);
         }
 
@@ -140,16 +136,14 @@ namespace MoviesWatchedInfrastructure.Controllers
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
+
 
             var actor = await _context.Actors
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (actor == null)
-            {
                 return NotFound();
-            }
+
 
             return View(actor);
         }
@@ -160,14 +154,25 @@ namespace MoviesWatchedInfrastructure.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var actor = await _context.Actors.FindAsync(id);
-            if (actor != null)
-            {
-                _context.Actors.Remove(actor);
-            }
 
+            if (actor == null)
+                return NotFound();
+
+
+            bool hasLinkedMovies = await _context.MoviesActors.AnyAsync(ma => ma.ActorId == id);
+
+            if (hasLinkedMovies)
+                return Json(new { success = false, message = "Цей актор пов'язаний з фільмами та не може бути видалений." });
+
+
+            _context.Actors.Remove(actor);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return Json(new { success = true, message = "Актор успішно видалений." });
         }
+
+
+
 
         private bool ActorExists(int id)
         {

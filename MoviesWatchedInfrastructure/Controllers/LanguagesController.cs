@@ -159,13 +159,27 @@ namespace MoviesWatchedInfrastructure.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var language = await _context.Languages.FindAsync(id);
-            if (language != null)
-            {
-                _context.Languages.Remove(language);
-            }
+            if (language == null)
+                return NotFound();
 
+
+            if (await IsLanguageLinkedToMovies(id))
+                return Json(new { success = false, message = "Ця мова пов'язана з фільмами та не може бути видалена." });
+
+
+            await DeleteLanguage(language);
+            return Json(new { success = true, message = "Мова успішно видалена." });
+        }
+
+        private async Task<bool> IsLanguageLinkedToMovies(int languageId)
+        {
+            return await _context.Movies.AnyAsync(m => m.LanguageId == languageId);
+        }
+
+        private async Task DeleteLanguage(Language language)
+        {
+            _context.Languages.Remove(language);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
         private bool LanguageExists(int id)
