@@ -34,7 +34,7 @@ namespace MoviesWatchedInfrastructure.Controllers
             }
 
             var language = await _context.Languages
-                .Include(l => l.Movies)
+                .Include(l => l.Movies) 
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (language == null)
@@ -175,7 +175,7 @@ namespace MoviesWatchedInfrastructure.Controllers
         private async Task<bool> IsLanguageExists(string name, int id)
         {
             var language = await _context.Languages
-                .FirstOrDefaultAsync(m => m.Name == name
+                .FirstOrDefaultAsync(m => m.Name == name 
                                        && m.Id != id);
 
             return language != null;
