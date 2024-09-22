@@ -165,17 +165,25 @@ namespace MoviesWatchedInfrastructure.Controllers
                 return NotFound();
 
 
-            // Перевірка на зв'язки з фільмами (MoviesGenres)
-            bool hasLinkedMovies = await _context.MoviesGenres.AnyAsync(mg => mg.GenreId == id);
-            if (hasLinkedMovies)
+            if (await IsGenreLinkedToMovies(id))
                 return Json(new { success = false, message = "Цей жанр пов'язаний з фільмами та не може бути видалений." });
 
 
-            _context.Genres.Remove(genre);
-            await _context.SaveChangesAsync();
-
+            await DeleteGenre(genre);
             return Json(new { success = true, message = "Жанр успішно видалений." });
         }
+
+        private async Task<bool> IsGenreLinkedToMovies(int genreId)
+        {
+            return await _context.MoviesGenres.AnyAsync(mg => mg.GenreId == genreId);
+        }
+
+        private async Task DeleteGenre(Genre genre)
+        {
+            _context.Genres.Remove(genre);
+            await _context.SaveChangesAsync();
+        }
+
 
 
         private bool GenreExists(int id)
